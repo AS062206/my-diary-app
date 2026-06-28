@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Camera, Image as ImageIcon, MapPin, Smile, Frown, Meh, Angry } from 'lucide-react';
+import { Camera, Image as ImageIcon, Smile, Frown, Meh, Angry } from 'lucide-react';
 import clsx from 'clsx';
 import { useDiary } from '../../context/DiaryContext';
 

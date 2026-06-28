@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { format } from 'date-fns';
 import { ThemeProvider } from './context/ThemeContext';
 import { DiaryProvider } from './context/DiaryContext';
