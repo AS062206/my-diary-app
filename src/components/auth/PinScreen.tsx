@@ -2,8 +2,16 @@ import { useState, useEffect } from 'react';
 import { Delete } from 'lucide-react';
 import clsx from 'clsx';
 
-const CORRECT_PIN = import.meta.env.VITE_APP_PIN || '1234';
+const PIN_HASH = import.meta.env.VITE_APP_PIN_HASH || '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'; // default: hash of '1234'
 const PIN_LENGTH = 4;
+
+async function computeHash(pin: string) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(pin);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 export function PinScreen({ onAuthenticated }: { onAuthenticated: () => void }) {
   const [pin, setPin] = useState('');
@@ -11,15 +19,17 @@ export function PinScreen({ onAuthenticated }: { onAuthenticated: () => void }) 
 
   useEffect(() => {
     if (pin.length === PIN_LENGTH) {
-      if (pin === CORRECT_PIN) {
-        onAuthenticated();
-      } else {
-        setError(true);
-        setTimeout(() => {
-          setPin('');
-          setError(false);
-        }, 500);
-      }
+      computeHash(pin).then(hashedPin => {
+        if (hashedPin === PIN_HASH) {
+          onAuthenticated();
+        } else {
+          setError(true);
+          setTimeout(() => {
+            setPin('');
+            setError(false);
+          }, 500);
+        }
+      });
     }
   }, [pin, onAuthenticated]);
 
