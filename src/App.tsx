@@ -7,6 +7,7 @@ import { DarkModeToggle } from './components/ui/DarkModeToggle';
 import { CalendarView } from './components/diary/CalendarView';
 import { DiaryForm } from './components/diary/DiaryForm';
 import { TimelineView } from './components/diary/TimelineView';
+import { PinScreen } from './components/auth/PinScreen';
 
 function AppContent() {
   const [currentTab, setCurrentTab] = useState('today');
@@ -51,6 +52,12 @@ function AppContent() {
 }
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  if (!isAuthenticated) {
+    return <PinScreen onAuthenticated={() => setIsAuthenticated(true)} />;
+  }
+
   return (
     <ThemeProvider>
       <DiaryProvider>

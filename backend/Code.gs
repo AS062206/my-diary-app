@@ -5,6 +5,7 @@
 const SHEET_NAME = 'Diary';
 const FOLDER_NAME = 'DiaryPhotos';
 const APP_URL = 'https://ここにアプリのURLを入力'; // （任意）カレンダーからのリンク先用
+const API_TOKEN = 'diary_secret_token_xyz'; // フロントエンドの VITE_GAS_API_TOKEN と一致させます
 
 // --- CORS用のヘッダー ---
 const HEADERS = {
@@ -46,6 +47,12 @@ function setup() {
  */
 function doGet(e) {
   try {
+    // トークンの検証
+    if (e.parameter.token !== API_TOKEN) {
+      return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'Unauthorized access' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheetByName(SHEET_NAME);
     
@@ -106,6 +113,13 @@ function doGet(e) {
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
+    
+    // トークンの検証
+    if (data.token !== API_TOKEN) {
+      return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'Unauthorized access' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     // 元のphotoUrl（画像変更がない場合はこれを使う）も受け取る
     const { id, date, content, mood, weather, photoUrl: existingPhotoUrl, photoBase64, photoExt } = data;
     

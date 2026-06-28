@@ -28,6 +28,7 @@ interface DiaryContextType {
 const DiaryContext = createContext<DiaryContextType | undefined>(undefined);
 
 const GAS_API_URL = import.meta.env.VITE_GAS_API_URL;
+const GAS_API_TOKEN = import.meta.env.VITE_GAS_API_TOKEN;
 
 // Helper to convert File to Base64
 const fileToBase64 = (file: File): Promise<string> => {
@@ -67,7 +68,8 @@ export function DiaryProvider({ children }: { children: ReactNode }) {
     // Fetch from GAS
     const fetchData = async () => {
       try {
-        const response = await fetch(GAS_API_URL);
+        const url = GAS_API_TOKEN ? `${GAS_API_URL}?token=${GAS_API_TOKEN}` : GAS_API_URL;
+        const response = await fetch(url);
         const data = await response.json();
         if (data.status === 'success') {
           // Fix image URLs that might be blocked by browser due to export=view redirect
@@ -98,12 +100,13 @@ export function DiaryProvider({ children }: { children: ReactNode }) {
       return; // Mock mode, do nothing
     }
     try {
+      const payload = { ...data, token: GAS_API_TOKEN };
       await fetch(GAS_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'text/plain', // avoid CORS preflight
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
     } catch (error) {
       console.error('Failed to post data to GAS:', error);
